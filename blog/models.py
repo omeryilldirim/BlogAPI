@@ -26,7 +26,7 @@ class Blog(models.Model):
     status = models.CharField(max_length=1, choices=STATUS)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     post_views = models.PositiveSmallIntegerField(default=0)
-    likes_n =models.ManyToManyField(User, related_name='likes_n', blank=True, null=True)
+    likes_n =models.ManyToManyField(User, related_name='likes_n')
 
     def __str__(self):
         return self.title
