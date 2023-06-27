@@ -8,12 +8,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class BlogSerializer(serializers.ModelSerializer):
-    # author = serializers.StringRelatedField()
-    # author_id = serializers.IntegerField(required=False, read_only=True)
-    # category = serializers.StringRelatedField()
-    # category_id = serializers.IntegerField(required=False, read_only=True)
+    category = serializers.StringRelatedField()
+    # category_id = serializers.IntegerField()
     comments = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    likes_n = serializers.ListField(required=False, read_only=True)
+    # likes = serializers.SerializerMethodField()
 
     class Meta:
         model = Blog
@@ -27,10 +27,13 @@ class BlogSerializer(serializers.ModelSerializer):
     def get_comment_count(self, obj):
         return Comment.objects.filter(post=obj).count()
     
-    
+    # def get_likes(self, obj):
+    #     return obj.likes_n.count()
+
+
 class CommentSerializer(serializers.ModelSerializer):
-    # user = serializers.StringRelatedField()
-    # user_id = serializers.IntegerField(required=False, read_only=True)
+    user = serializers.StringRelatedField()
+    user_id = serializers.IntegerField(required=False, read_only=True)
 
     class Meta:
         model = Comment

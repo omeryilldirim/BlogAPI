@@ -26,6 +26,11 @@ class BlogViewSet(ModelViewSet):
     serializer_class = BlogSerializer
     permission_classes = [CustomBlogsPermission]
 
+    def get_queryset(self):
+        if self.request.query_params.get('author', None):
+            author = self.request.query_params.get('author')
+            return Blog.objects.filter(author_id=author)
+        return super().get_queryset()
 
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()

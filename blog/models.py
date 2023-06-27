@@ -9,7 +9,6 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-    
 
 
 class Blog(models.Model):
@@ -19,14 +18,13 @@ class Blog(models.Model):
     )
     title = models.CharField(max_length=100)
     content = models.TextField()
-    image = models.URLField(max_length=400)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    image = models.URLField(max_length=400, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     publish_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=STATUS)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     post_views = models.PositiveSmallIntegerField(default=0)
-    likes_n =models.ManyToManyField(User, related_name='likes_n')
 
     def __str__(self):
         return self.title
