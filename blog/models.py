@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -25,10 +26,16 @@ class Blog(models.Model):
     status = models.CharField(max_length=1, choices=STATUS)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     post_views = models.PositiveSmallIntegerField(default=0)
+    likes_n = models.CharField(max_length=1024, blank=True, default='[]')
 
     def __str__(self):
         return self.title
     
+    def set_likes_n(self, value):
+        self.likes_n = json.dumps(value)
+
+    def get_likes_n(self):
+        return json.loads(self.likes_n)
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

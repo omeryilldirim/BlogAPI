@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, SAFE_METHODS
@@ -9,6 +10,8 @@ from .serializers import (
     Blog, BlogSerializer,
     Comment, CommentSerializer
 )
+import json
+from django.core.serializers import serialize
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
@@ -36,3 +39,21 @@ class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [CustomCommentPermission]
+
+
+@api_view(['POST', 'GET'])
+def like(request, pk):
+    if request.method == 'POST':
+        user = json.loads(serialize('json', [request.user]))[0].get('pk')
+        blog = Blog.objects.get(pk=pk)
+        likes_list = blog.get_likes_n()
+        if user in likes_list:
+            likes_list.remove(user)
+        else:
+            likes_list.append(user)
+        blog.set_likes_n(likes_list)
+        blog.save()
+        return Response(status=status.HTTP_200_OK)
+    elif request.method == 'GET':
+        blog = Blog.objects.get(pk=pk)
+        return Response(blog.likes_n, status=status.HTTP_200_OK)

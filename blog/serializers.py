@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Blog, Comment
+import json
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,13 +14,20 @@ class BlogSerializer(serializers.ModelSerializer):
     # category_id = serializers.IntegerField()
     comments = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
-    likes_n = serializers.ListField(required=False, read_only=True)
-    # likes = serializers.SerializerMethodField()
+    likes_n = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
+    author = serializers.StringRelatedField()
 
     class Meta:
         model = Blog
         exclude = []
 
+    def create(self, validated_data):
+        author = self.context['request'].user
+        validated_data['author'] = author
+        blog = Blog.objects.create(**validated_data)
+        return blog
+    
     def get_comments(self, obj):
         comments = Comment.objects.filter(post=obj)
         serializer = CommentSerializer(comments, many=True)
@@ -26,10 +35,12 @@ class BlogSerializer(serializers.ModelSerializer):
 
     def get_comment_count(self, obj):
         return Comment.objects.filter(post=obj).count()
-    
-    # def get_likes(self, obj):
-    #     return obj.likes_n.count()
 
+    def get_likes(self, obj):
+        return len(json.loads(obj.likes_n))
+
+    def get_likes_n(self, obj):
+        return json.loads(obj.likes_n)
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
